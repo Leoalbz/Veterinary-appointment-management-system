@@ -1,7 +1,7 @@
-import conexion as cs  # Importamos el módulo de conexión a MySQL
+import conexion as cs 
 
 class Pacientes:
-    # Agregar paciente
+
     def agregar_paciente(self, paciente):
         conexion, cursor = cs.conectar()
         sql = "INSERT INTO pacientes (nombre, raza, edad, diagnostico, tratamiento, telefono, email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
@@ -10,8 +10,29 @@ class Pacientes:
         conexion.commit()
         conexion.close()
 
-    # Mostrar todos los pacientes
-    def mostrar_pacientes(self):
+
+    def mostrar_paciente(self, nombre):
+     conexion, cursor = cs.conectar()
+     sql = "SELECT nombre, raza, edad, diagnostico, tratamiento, telefono, email FROM pacientes WHERE nombre = %s"
+     cursor.execute(sql, (nombre,))
+     resultado = cursor.fetchone()
+     conexion.close()
+     if resultado:
+                paciente = {
+                "nombre": resultado[0],
+                "raza": resultado[1],
+                "edad": resultado[2],
+                "diagnostico": resultado[3],
+                "tratamiento": resultado[4],
+                "telefono": resultado[5],
+                "email": resultado[6]
+        }
+                return paciente
+     else:
+           return None
+
+    
+    def mostrar_todos_los_pacientes(self):
         conexion, cursor = cs.conectar()
         sql = "SELECT * FROM pacientes"
         cursor.execute(sql)
@@ -20,25 +41,11 @@ class Pacientes:
         
         pacientes_texto = ""
         for paciente in resultado:
-            pacientes_texto += f"ID: {paciente[0]}, Nombre: {paciente[1]}, Raza: {paciente[2]}, Edad: {paciente[3]}, Diagnóstico: {paciente[4]}, Tratamiento: {paciente[5]}, Telefono: {paciente[5]}, Email:{paciente[6]}\n"
+            pacientes_texto += f"ID: {paciente[0]}, Nombre: {paciente[1]}, Raza: {paciente[2]}, Edad: {paciente[3]}, Teléfono: {paciente[4]}, Email: {paciente[5]}, Diagnóstico: {paciente[6]}, Tratamiento: {paciente[7]}\n"
         
         return pacientes_texto
 
-    # 🔹 Mostrar un solo paciente por nombre
-    def mostrar_paciente(self, nombre):
-        conexion, cursor = cs.conectar()
-        sql = "SELECT * FROM pacientes WHERE nombre = %s"
-        cursor.execute(sql, (nombre,))
-        resultado = cursor.fetchall()
-        conexion.close()
 
-        if resultado:
-            paciente = resultado[0]
-            return f"ID: {paciente[0]}, Nombre: {paciente[1]}, Raza: {paciente[2]}, Edad: {paciente[3]}, Diagnóstico: {paciente[4]}, Tratamiento: {paciente[5]},Telefono: {paciente[5]}, Email:{paciente[6]}"
-        else:
-            return "Paciente no encontrado."
-
-    # 🔹 Actualizar los datos de un paciente por ID
     def actualizar_paciente(self, nombre, raza, edad, diagnostico, tratamiento, telefono, email):
         conexion, cursor = cs.conectar()
         sql = """UPDATE pacientes SET nombre = %s, raza = %s, edad = %s, 
@@ -47,13 +54,24 @@ class Pacientes:
         cursor.execute(sql, valores)
         conexion.commit()
         conexion.close()
-
-    # Eliminar paciente
-    def eliminar_paciente(self, nombre):
+    
+    def actualizar_paciente(self, nombre, nuevos_datos):
         conexion, cursor = cs.conectar()
-        sql = "DELETE FROM pacientes WHERE nombre = %s"
-        cursor.execute(sql, (nombre))
+        sql = """UPDATE pacientes SET nombre = %s, raza = %s, edad = %s, diagnostico = %s, tratamiento = %s, telefono = %s, email = %s WHERE nombre = %s"""
+        valores = (nuevos_datos["nombre"], nuevos_datos["raza"], nuevos_datos["edad"], nuevos_datos["diagnostico"], nuevos_datos["tratamiento"], nuevos_datos["telefono"], nuevos_datos["email"], nombre)
+        cursor.execute(sql, valores)
         conexion.commit()
         conexion.close()
+
+
+
+    def eliminar_paciente(self, nombre):
+     conexion, cursor = cs.conectar()
+     sql = "DELETE FROM pacientes WHERE nombre = %s"
+     valores = (nombre,)
+     cursor.execute(sql, valores)
+     conexion.commit()
+     conexion.close()
+
 
 pacientes = Pacientes()
