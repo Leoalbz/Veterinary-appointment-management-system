@@ -1,6 +1,6 @@
 .env
 .rar
-.spec
+gestion_pacientes_poo.spec
 
 dist
 build
